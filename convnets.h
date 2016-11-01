@@ -14,3 +14,5 @@
 #include <opencv2/highgui/highgui.hpp>
 
 QVector<cv::Mat> convGenerator(int size, int number);
+QVector<cv::Mat> zeropadding1(cv::Mat rgbd, int padding);
+cv::Mat relu(cv::Mat res);

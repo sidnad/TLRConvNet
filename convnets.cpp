@@ -23,3 +23,27 @@ QVector<cv::Mat> convGenerator(int size, int number){
 
     return convnetList;
 }
+
+QVector<cv::Mat> zeropadding1(cv::Mat rgbd, int padding){
+    cv::copyMakeBorder( rgbd, rgbd, padding, padding, padding, padding, cv::BORDER_CONSTANT, cv::Scalar(0,0,0,0) );
+}
+
+QVector<cv::Mat> zeropadding2(cv::Mat rgbd, int padding){
+    cv::copyMakeBorder( rgbd, rgbd, padding, padding, padding, padding, cv::BORDER_CONSTANT, cv::Scalar(0,0,0,0,0,0,0,0) );
+}
+
+cv::Mat relu(cv::Mat res){
+    QVector<cv::Mat> splitLayer;
+    cv::split(res, splitLayer);
+    for(int i = 0; i < splitLayer.length(); i++){
+        for(int x = 0; x < splitLayer.at(i).rows; x++){
+            for(int y = 0; y < splitLayer.at(i).cols; y++){
+                if (splitLayer.at(i).at<cv::Vec4d>(x,y)[0] < 0){
+                    splitLayer.at(i).at<cv::Vec4d>(x,y)[0] = 0;
+                }
+            }
+        }
+    }
+    cv::merge(splitLayer, res);
+    return res;
+}

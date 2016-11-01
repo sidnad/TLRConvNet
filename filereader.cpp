@@ -75,7 +75,7 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
         img = cv::imread(data.at(0).at(i));
         depth = cv::imread(data.at(1).at(i));
         depth = (depth/256).astype('uint8');
-        cv::split(img,splitBGR);
+        cv::split(img, splitBGR);
         splitRGB.push_back(depth);
         cv::merge(splitRGB, rgbd);
         rgbdList.push_back(rgbd);
@@ -84,7 +84,7 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
         img = cv::imread(data.at(2).at(i));
         depth = cv::imread(data.at(3).at(i));
         depth = (depth/256).astype('uint8');
-        cv::split(img,splitBGR);
+        cv::split(img, splitBGR);
         splitRGB.push_back(depth);
         cv::merge(splitRGB, rgbd);
         rgbdList.push_back(rgbd);

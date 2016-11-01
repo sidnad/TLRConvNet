@@ -17,12 +17,12 @@ int main(int argc, char *argv[])
     QVector<cv::Mat> conv1 = convGenerator(7, 8); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
     QVector<cv::Mat> conv2 = convGenerator(5, 16); // 5x5, 16 filters
     QVector<cv::Mat> res1, res2;
-    QVector<cv::Mat> rgbd(100, 100, CV_8UC4, cv::Scalar(0, 0, 0, 0));
+    QVector<cv::Mat> rgbd(100, 100, CV_64FC4, cv::Scalar(0, 0, 0, 0));
 
     for (int i = 0; i < rgbdList.length(); i++){
         rgbd = rgbdList.at(i);
         //ZERO PADDING 1
-        rgbd = zeropadding(rgbd, 2);
+        rgbd = zeropadding1(rgbd, 2);
         //CONV1
         res1 = convolution(rgbd, conv1, 1);//stride = 1
         //RELU LAYER
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         //POOLING
         res1 = pooling(res1, 4);
         //ZERO PADDING 2
-        rgbd = zeropadding(rgbd, 1);
+        rgbd = zeropadding2(rgbd, 1);
         //CONV2
         res2 = convolution(res1, conv1, 1);//stride = 1
         //RELU LAYER
