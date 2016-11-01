@@ -17,9 +17,10 @@ int main(int argc, char *argv[])
     QVector<QVector<cv::Mat>> conv1 = convGenerator(7, 8); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
     QVector<QVector<cv::Mat>> conv2 = convGenerator(5, 16); // 5x5, 16 filters
     QVector<QVector<cv::Mat>> res1, res2;
+    QVector<cv::Mat> rgbd;
 
     for (int i = 0; i < rgbdList.length(); i++){
-        QVector<cv::Mat> rgbd = rgbdList.at(i);
+        rgbd = rgbdList.at(i);
         //ZERO PADDING 1
         rgbd = zeropadding(rgbd, 2);
         //CONV1
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
         //RELU LAYER
         res1 = relu(res1);
         //POOLING
-        res1 = pooling(res1, 2);
+        res1 = pooling(res1, 4);
         //ZERO PADDING 2
         rgbd = zeropadding(rgbd, 1);
         //CONV2
@@ -35,22 +36,26 @@ int main(int argc, char *argv[])
         //RELU LAYER
         res2 = relu(res2);
         //POOLING
-        res2 = pooling(res2, 2);
-
+        res2 = pooling(res2, 4);
     }
+    //RESHAPE
+    cv::Mat res3;
+    res3 = reshape(res2); //150 * (7*7*16) = 150*784
+
+    //CLASSIFICATION
+    QVector<QVector<double>> res4; // [0.89 0.54], ...
+    cv::Mat fullyConnLayerWeight = (784, 2, CV_8UC3, cv::Scalar(0,0,0));
+
+    res4 = matrixMult(res3, fullyConnLayerWeight);
+
+    //COST
+    QVector<double> cost;
+    cost = calculateCost(res4, rgbd_gt);
+    double totalCost;
+    totalCost = sumUp(cost);
+
+    //BP
 
 
-
-
-
-    /*
-    cv::Mat img = cv::imread(imgPath);
-
-    std::vector<Mat> planes(3);
-
-    cv::namedWindow("PuRSE");
-    cv::imshow("PuRSE", img);
-    std::cout << (int)img.at<cv::Vec3b>(50,50)[0] << std::endl;
-    cv::waitKey(10);*/
     return a.exec();
 }
