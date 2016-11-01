@@ -55,3 +55,49 @@ QVector<QVector<QString>> freader(){
 
     return data;
 }
+
+
+QVector<QVector<QString>> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
+    QVector<QVector<QString>> rgbdList = QVector<QVector<QString>>();
+    int positiveCount, negativeCount, positive4train, negative4train;
+
+    positiveCount = data.at(0).length();
+    negativeCount = data.at(2).length();
+
+    positive4train = floor(training_portion * positiveCount);
+    negative4train = floor(training_portion * negativeCount);
+
+    QVector<QString> fp_rgb, fp_depth;
+    for (int i = 0; i < positive4train; i++){
+        fp_rgb.push_back(data.at(0).at(i));
+        fp_depth.push_back(data.at(1).at(i));
+    }
+    for (int i = 0; i < positive4train; i++){
+        fp_rgb.push_back(data.at(2).at(i));
+        fp_depth.push_back(data.at(3).at(i));
+    }
+    rgbdList.push_back(fp_rgb);
+    rgbdList.push_back(fp_depth);
+    return rgbdList;
+}
+
+
+QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portion){
+    QVector<int> rgbd_gt = QVector<int>();
+    int positiveCount, negativeCount, positive4train, negative4train;
+
+    positiveCount = data.at(0).length();
+    negativeCount = data.at(2).length();
+
+    positive4train = floor(training_portion * positiveCount);
+    negative4train = floor(training_portion * negativeCount);
+
+    for (int i = 0; i < positive4train; i++){
+        rgbd_gt.push_back(1);
+    }
+    for (int i = 0; i < positive4train; i++){
+        rgbd_gt.push_back(0);
+    }
+
+    return rgbd_gt;
+}
