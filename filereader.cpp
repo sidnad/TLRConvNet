@@ -61,7 +61,7 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
     QVector<cv::Mat> rgbdList = QVector<cv::Mat>();
     cv::Mat img, depth;
     cv::Mat rgbd(100, 100, CV_8UC4, cv::Scalar(0, 0, 0, 0));
-    QVector<cv::Mat> splitBGR;
+    std::vector<cv::Mat> splitBGR;
     int positiveCount, negativeCount, positive4train, negative4train;
 
     positiveCount = data.at(0).length();
@@ -72,21 +72,21 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
 
     QVector<QString> fp_rgb, fp_depth;
     for (int i = 0; i < positive4train; i++){
-        img = cv::imread(data.at(0).at(i));
-        depth = cv::imread(data.at(1).at(i));
-        depth = (depth/256).astype('uint8');
+        img = cv::imread(data.at(0).at(i).toStdString());
+        depth = cv::imread(data.at(1).at(i).toStdString());
+        cv::convertScaleAbs(depth,depth,1,0);
         cv::split(img, splitBGR);
-        splitRGB.push_back(depth);
-        cv::merge(splitRGB, rgbd);
+        splitBGR.push_back(depth);
+        cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
     }
     for (int i = 0; i < positive4train; i++){
-        img = cv::imread(data.at(2).at(i));
-        depth = cv::imread(data.at(3).at(i));
-        depth = (depth/256).astype('uint8');
+        img = cv::imread(data.at(2).at(i).toStdString());
+        depth = cv::imread(data.at(3).at(i).toStdString());
+        cv::convertScaleAbs(depth,depth,1,0);
         cv::split(img, splitBGR);
-        splitRGB.push_back(depth);
-        cv::merge(splitRGB, rgbd);
+        splitBGR.push_back(depth);
+        cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
     }
     return rgbdList;

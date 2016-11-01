@@ -13,6 +13,9 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-QVector<cv::Mat> convGenerator(int size, int number);
+QVector<cv::Mat> convGenerator(int size, int number, int epoch);
 QVector<cv::Mat> zeropadding1(cv::Mat rgbd, int padding);
 cv::Mat relu(cv::Mat res);
+cv::Mat convolution(cv::Mat rgbd, QVector<cv::Mat> conv, int filterCount);
+cv::Mat pooling(cv::Mat res, int size, int epoch);
+cv::Mat reshape(QVector<cv::Mat> res);
