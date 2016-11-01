@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
 
     QVector<QVector<QString>> data = freader();
 
-    QVector<cv::Mat> rgbdList = farranger_rgbd(data, 0.7); // former 70% for training.
-    QVector<int> rgbd_gt = farranger_gt(data, 0.7);//ground truth, 1 for TL, 0 for other.
+    QVector<cv::Mat> rgbdList = farranger_rgbd(data, 0.07); // former 70% for training.
+    QVector<int> rgbd_gt = farranger_gt(data, 0.07);//ground truth, 1 for TL, 0 for other.
 
     QVector<cv::Mat> conv1 = convGenerator(7, 8, 1); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
     QVector<cv::Mat> conv2 = convGenerator(5, 16, 2); // 5x5, 16 filters, 8 layers each.
@@ -22,36 +22,42 @@ int main(int argc, char *argv[])
     cv::Mat rgbd(100, 100, CV_64FC4, cv::Scalar(0, 0, 0, 0));
 
     for (int i = 0; i < rgbdList.length(); i++){
+        std::cout << "iteration: " << i << "  -------------epoch 1-------------" << std::endl;
         rgbd = rgbdList.at(i);
         //ZERO PADDING 1
-        //rgbd = zeropadding1(rgbd, 2);
+        rgbd = zeropadding(rgbd, 3);
         //CONV1
-        res1 = convolution(rgbd, conv1, 8);
+        res1 = convolution(rgbd, conv1, 8, 1);
         //RELU LAYER
         res1 = relu(res1);
         //POOLING
         res1 = pooling(res1, 4, 1);
+        std::cout << "iteration: " << i << "  -------------epoch 2-------------" << std::endl;
         //ZERO PADDING 2
-        //rgbd = zeropadding2(rgbd, 1);
+        res1 = zeropadding(res1, 2);
         //CONV2
-        res2 = convolution(res1, conv1, 16);
+        res2 = convolution(res1, conv2, 16, 2);
         //RELU LAYER
         res2 = relu(res2);
         //POOLING
         res2 = pooling(res2, 4, 2);
+
         res2list.push_back(res2);
     }
     //RESHAPE
     cv::Mat res3;
-    res3 = reshape(res2list); //150 * (5*5*16) = 150*400
+    res3 = reshape(res2list); //522 * (6*6*16) = 150*576
     double val;
-    for(int i = 0; i < 150; i++){
-        for(int j = 0; j < 400; j++){
+
+    for(int i = 0; i < 51; i++){
+        for(int j = 0; j < 576; j++){
             val = res3.at<double>(i,j);
-            //if(val != 0)
+            if(val != 0)
                 std::cout << val << std::endl;
         }
     }
+
+    cv::convertScaleAbs(res3,res3,1,0);
 
     cv::namedWindow("PuRSE");
     cv::imshow("PuRSE", res3);

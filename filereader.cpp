@@ -2,10 +2,10 @@
 
 QVector<QVector<QString>> freader(){
 
-    QString imgPath_positive = "../570CNN/cropped_data/reshape_positive_rgb/";
-    QString depthPath_positive = "../570CNN/cropped_data/reshape_positive_depth/";
-    QString imgPath_negative = "../570CNN/cropped_data/reshape_negative_rgb/";
-    QString depthPath_negative = "../570CNN/cropped_data/reshape_negative_depth/";
+    QString imgPath_positive = "../TLRConvNet/cropped_data/reshape_positive_rgb/";
+    QString depthPath_positive = "../TLRConvNet/cropped_data/reshape_positive_depth/";
+    QString imgPath_negative = "../TLRConvNet/cropped_data/reshape_negative_rgb/";
+    QString depthPath_negative = "../TLRConvNet/cropped_data/reshape_negative_depth/";
 
     QDir imgPosDir(imgPath_positive);
     QDir depthPosDir(depthPath_positive);
@@ -69,6 +69,9 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
 
     positive4train = floor(training_portion * positiveCount);
     negative4train = floor(training_portion * negativeCount);
+
+    std::cout << "Total data amount: " << positiveCount + negativeCount << ". Positive count: " << positiveCount << ". Negative count: " << negativeCount << std::endl;
+    std::cout << "Total training data (70%) amount: " << positive4train + negative4train << std::endl;
 
     QVector<QString> fp_rgb, fp_depth;
     for (int i = 0; i < positive4train; i++){
