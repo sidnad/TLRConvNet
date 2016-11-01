@@ -10,7 +10,10 @@
 #include <QVector>
 #include <stdio.h>      /* printf */
 #include <math.h>
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 QVector<QVector<QString>> freader();
-QVector<QVector<QString>> farranger_rgbd(QVector<QVector<QString>> data, double training_portion );
+QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion );
 QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portion );

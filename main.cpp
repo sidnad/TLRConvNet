@@ -11,13 +11,13 @@ int main(int argc, char *argv[])
 
     QVector<QVector<QString>> data = freader();
 
-    QVector<QVector<QString>> rgbdList = farranger_rgbd(data, 0.7); // former 70% for training.
+    QVector<cv::Mat> rgbdList = farranger_rgbd(data, 0.7); // former 70% for training.
     QVector<int> rgbd_gt = farranger_gt(data, 0.7);//ground truth, 1 for TL, 0 for other.
 
-    QVector<QVector<cv::Mat>> conv1 = convGenerator(7, 8); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
-    QVector<QVector<cv::Mat>> conv2 = convGenerator(5, 16); // 5x5, 16 filters
-    QVector<QVector<cv::Mat>> res1, res2;
-    QVector<cv::Mat> rgbd;
+    QVector<cv::Mat> conv1 = convGenerator(7, 8); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
+    QVector<cv::Mat> conv2 = convGenerator(5, 16); // 5x5, 16 filters
+    QVector<cv::Mat> res1, res2;
+    QVector<cv::Mat> rgbd(100, 100, CV_8UC4, cv::Scalar(0, 0, 0, 0));
 
     for (int i = 0; i < rgbdList.length(); i++){
         rgbd = rgbdList.at(i);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     //CLASSIFICATION
     QVector<QVector<double>> res4; // [0.89 0.54], ...
-    cv::Mat fullyConnLayerWeight = (784, 2, CV_8UC3, cv::Scalar(0,0,0));
+    cv::Mat fullyConnLayerWeight = (784, 2, CV_8UC1, cv::Scalar(0));
 
     res4 = matrixMult(res3, fullyConnLayerWeight);
 

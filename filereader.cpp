@@ -57,8 +57,11 @@ QVector<QVector<QString>> freader(){
 }
 
 
-QVector<QVector<QString>> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
-    QVector<QVector<QString>> rgbdList = QVector<QVector<QString>>();
+QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
+    QVector<cv::Mat> rgbdList = QVector<cv::Mat>();
+    cv::Mat img, depth;
+    cv::Mat rgbd(100, 100, CV_8UC4, cv::Scalar(0, 0, 0, 0));
+    QVector<cv::Mat> splitBGR;
     int positiveCount, negativeCount, positive4train, negative4train;
 
     positiveCount = data.at(0).length();
@@ -69,15 +72,23 @@ QVector<QVector<QString>> farranger_rgbd(QVector<QVector<QString>> data, double 
 
     QVector<QString> fp_rgb, fp_depth;
     for (int i = 0; i < positive4train; i++){
-        fp_rgb.push_back(data.at(0).at(i));
-        fp_depth.push_back(data.at(1).at(i));
+        img = cv::imread(data.at(0).at(i));
+        depth = cv::imread(data.at(1).at(i));
+        depth = (depth/256).astype('uint8');
+        cv::split(img,splitBGR);
+        splitRGB.push_back(depth);
+        cv::merge(splitRGB, rgbd);
+        rgbdList.push_back(rgbd);
     }
     for (int i = 0; i < positive4train; i++){
-        fp_rgb.push_back(data.at(2).at(i));
-        fp_depth.push_back(data.at(3).at(i));
+        img = cv::imread(data.at(2).at(i));
+        depth = cv::imread(data.at(3).at(i));
+        depth = (depth/256).astype('uint8');
+        cv::split(img,splitBGR);
+        splitRGB.push_back(depth);
+        cv::merge(splitRGB, rgbd);
+        rgbdList.push_back(rgbd);
     }
-    rgbdList.push_back(fp_rgb);
-    rgbdList.push_back(fp_depth);
     return rgbdList;
 }
 
