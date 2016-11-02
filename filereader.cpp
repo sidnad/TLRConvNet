@@ -60,8 +60,8 @@ QVector<QVector<QString>> freader(){
 QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
     QVector<cv::Mat> rgbdList = QVector<cv::Mat>();
     cv::Mat img, depth;
-    cv::Mat rgbd(100, 100, CV_8UC4, cv::Scalar(0, 0, 0, 0));
-    std::vector<cv::Mat> splitBGR;
+    cv::Mat rgbd;
+    std::vector<cv::Mat> splitBGR, splitDepth;
     int positiveCount, negativeCount, positive4train, negative4train;
 
     positiveCount = data.at(0).length();
@@ -79,19 +79,35 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
         depth = cv::imread(data.at(1).at(i).toStdString());
         cv::convertScaleAbs(depth,depth,1,0);
         cv::split(img, splitBGR);
-        splitBGR.push_back(depth);
+        cv::split(depth, splitDepth);
+        splitBGR.push_back(splitDepth[0]);
         cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
     }
-    for (int i = 0; i < positive4train; i++){
+    for (int i = 0; i < negative4train; i++){
         img = cv::imread(data.at(2).at(i).toStdString());
         depth = cv::imread(data.at(3).at(i).toStdString());
         cv::convertScaleAbs(depth,depth,1,0);
         cv::split(img, splitBGR);
-        splitBGR.push_back(depth);
+        cv::split(depth, splitDepth);
+        splitBGR.push_back(splitDepth[0]);
         cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
     }
+
+    depth = cv::imread(data.at(3).at(25).toStdString());
+    cv::Mat depth8;
+    cv::namedWindow("PuRSE");
+    //cv::convertScaleAbs(depth,depth,1,0);
+    cv::imshow("PuRSE", depth);
+    cv::waitKey(300);
+    for(int u = 0; u < depth.rows; u++){
+        for(int v = 0; v < depth.cols; v++){
+            //depth8.at<int>(u,v) = depth.at<CV_16U>(u,v)/256;
+            std::cout << "----------------------value: " << depth.at<int>(u,v) << std::endl;
+        }
+    }
+
     return rgbdList;
 }
 

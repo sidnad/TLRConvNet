@@ -1,13 +1,18 @@
 #include "convnets.h"
 
-QVector<cv::Mat> convGenerator(int size, int number, int epoch){
-    QVector<cv::Mat> convnetList;
+std::vector<cv::Mat> convGenerator(int size, int number, int epoch){
+    std::vector<cv::Mat> convnetList;
     cv::Mat convnet;
     double r;
 
     qsrand(1); //choose seed
     for (int i = 0; i < number; i++){
-        convnet = cv::Mat(size, size, CV_64FC(4*epoch), cv::Scalar(0, 0, 0, 0));
+        if (epoch == 1){
+            convnet = cv::Mat(size, size, CV_64FC(4), cv::Scalar(0, 0, 0, 0));
+        }
+        else if (epoch == 2){
+            convnet = cv::Mat(size, size, CV_64FC(8), cv::Scalar(0, 0, 0, 0));
+        }
 
         for (int k = 0; k < size; k++){
             for (int l = 0; l < size; l++){
@@ -30,24 +35,46 @@ cv::Mat zeropadding(cv::Mat rgbd, int padding){
     return rgbd;
 }
 
-cv::Mat relu(cv::Mat res){
+cv::Mat relu(cv::Mat res, int epoch){
     std::vector<cv::Mat> splitLayer;
     cv::split(res, splitLayer);
     for(int i = 0; i < splitLayer.size(); i++){
+
         for(int x = 0; x < splitLayer[i].rows; x++){
             for(int y = 0; y < splitLayer[i].cols; y++){
-                if (splitLayer[i].at<cv::Vec4d>(x,y)[0] < 0){
-                    splitLayer[i].at<cv::Vec4d>(x,y)[0] = 0;
+                if (splitLayer[i].at<double>(x,y) < 0){
+                    splitLayer[i].at<double>(x,y) = 0;
                 }
             }
         }
+        /*
+        if(epoch == 2){
+            cv::namedWindow("PuRSE");
+            cv::convertScaleAbs(splitLayer[i],splitLayer[i],1,0);
+            cv::imshow("PuRSE", splitLayer[i]);
+            cv::waitKey(300);
+        }*/
     }
     cv::merge(splitLayer, res);
     return res;
 }
 
-cv::Mat convolution(cv::Mat rgbd, QVector<cv::Mat> kernel, int filterCount, int epoch){
-
+cv::Mat convolution(cv::Mat rgbd, std::vector<cv::Mat> kernel, int filterCount, int epoch){
+ /*    //view rgb image
+    if (epoch == 2){
+        cv::namedWindow("PuRSE");
+        std::vector<cv::Mat> rgbdlayer,rgblayer;
+        cv::Mat rgb;
+        cv::split(rgbd, rgbdlayer);
+        rgblayer.push_back(rgbdlayer[0]);
+        rgblayer.push_back(rgbdlayer[1]);
+        rgblayer.push_back(rgbdlayer[2]);
+        cv::merge(rgblayer, rgb);
+        cv::convertScaleAbs(rgb,rgb,1,0);
+        cv::imshow("PuRSE", rgb);
+        cv::waitKey(3000);
+    }
+*/
     std::cout << "dimension of the input: " << rgbd.rows << std::endl;
     std::cout << "dimension of each kernel: " << kernel.at(0).rows << std::endl;
 
@@ -63,36 +90,65 @@ cv::Mat convolution(cv::Mat rgbd, QVector<cv::Mat> kernel, int filterCount, int 
     cv::Mat res(size, size, CV_64F);
     cv::Mat output;
     double tempval;
-    for(int i = 0; i < kernel.length(); i++){ // 8 or 16 loops
+
+    std::vector<cv::Mat> rgbdlist; // 4 layers / 8 layers
+    cv::split(rgbd,rgbdlist);
+    std::cout << "rgbd's dimension: " << rgbdlist.size() << std::endl;
+    std::vector<cv::Mat> singleKernelList; // 4 layers / 8 layers
+
+
+    for(int u = 0; u < rgbdlist.at(0).rows; u++){
+        for(int v = 0; v < rgbdlist.at(0).cols; v++){
+            std::cout << "----------------------value: " << rgbd.at<cv::Vec4d>(u,v)[0] << std::endl;
+        }
+    }
+
+
+
+    for(int i = 0; i < kernel.size(); i++){ // 8 or 16 loops
+
+        cv::split(kernel.at(i),singleKernelList);
         for(int x = 0; x < rgbd.rows - kernel.at(i).cols + 1; x++){
             for(int y = 0; y < rgbd.cols - kernel.at(i).cols + 1; y++){
                 tempval = 0;
-                for(int layer = 0; layer < 4; layer++){
-                    for(int u = 0; u < kernel.at(i).rows; u++){
-                        for(int v = 0; v < kernel.at(i).cols; v++){
-                            tempval = tempval + kernel.at(i).at<cv::Vec4d>(u,v)[layer] * rgbd.at<cv::Vec4d>(x+u, y+v)[layer];
-                        }
+                for(int u = 0; u < kernel.at(i).rows; u++){
+                    for(int v = 0; v < kernel.at(i).cols; v++){
+                            for (int l = 0; l < rgbdlist.size(); l++){
+                                double kernelVal = singleKernelList.at(l).at<double>(u,v);
+                                int rgbdVal = rgbdlist[l].at<int>(x+u, y+v);
+                                std::cout << kernelVal << " " << rgbdVal << std::endl;
+                                tempval = tempval + kernelVal * rgbdVal;
+                            }
                     }
                 }
                 tempval = tempval/(kernel.at(i).rows*kernel.at(i).cols)/4; // val/25
                 res.at<double>(x, y) = tempval;
+                //std::cout<< tempval<<std::endl;
             }
         }
-        /*
-        cv::namedWindow("PuRSE");
-        cv::convertScaleAbs(res,res,1,0);
-        cv::imshow("PuRSE", res);
-        cv::waitKey(1000);*/
+/*
+        if(epoch == 2){
+            cv::namedWindow("PuRSE");
+            cv::convertScaleAbs(res,res,1,0);
+            cv::imshow("PuRSE", res);
+            cv::waitKey(5000);
+        }
+*/
 
+/*
+        //kernel print
+        for(int u = 0; u < kernel.at(i).rows; u++){
+            for(int v = 0; v < kernel.at(i).cols; v++){
+                std::cout<< " "<< kernel.at(i).at<double>(u,v);
+            }
+            std::cout<< " "<<std::endl;
+        }
+        std::cout<< " "<<std::endl;
+        std::cout<< " "<<std::endl;
+*/
         resList.push_back(res);
     }
 
-    /*
-    cv::namedWindow("PuRSE");
-    cv::convertScaleAbs(res,res,1,0);
-    cv::imshow("PuRSE", res);
-    cv::waitKey(1000000000000);
-    */
 
     cv::merge(resList, output);
     return output;
@@ -104,6 +160,20 @@ cv::Mat pooling(cv::Mat res, int size, int epoch){
     pyrDown( res, des, cv::Size( res.cols/(2), res.rows/(2) ));
     pyrDown( des, des, cv::Size( des.cols/(2), des.rows/(2) ));
     std::cout << "epoch: " << epoch << " new dimension after pooling: " << des.rows << std::endl;
+
+/*
+    cv::namedWindow("PuRSE");
+    std::vector<cv::Mat> reslayer,rgblayer;
+    cv::Mat rgb;
+    cv::split(res, reslayer);
+    rgblayer.push_back(reslayer[0]);
+    rgblayer.push_back(reslayer[1]);
+    rgblayer.push_back(reslayer[2]);
+    cv::merge(rgblayer, rgb);
+    cv::convertScaleAbs(rgb,rgb,1,0);
+    cv::imshow("PuRSE", rgb);
+    cv::waitKey(3000);
+*/
     return des;
 }
 
