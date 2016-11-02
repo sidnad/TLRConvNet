@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     cv::imshow("PuRSE", outputfinal);
     cv::waitKey(10);
 
-    /*
+    
     //CLASSIFICATION
     QVector<QVector<double>> res4; // [0.89 0.54], ...
     cv::Mat fullyConnLayerWeight = (784, 2, CV_8UC1, cv::Scalar(0));
@@ -96,9 +96,13 @@ int main(int argc, char *argv[])
     double totalCost;
     totalCost = sumUp(cost);
 
-    //BP
-    */
 
+    
+    //Back Propagation Part
+    cv::Mat expected, fullyconnected;
+    cv::Mat errorMat = error(outputfinal, expected);
+    
+    cv::Mat adjust(errorMat, fullyConnLayerWeight);
 
     return a.exec();
 }
