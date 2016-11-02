@@ -15,5 +15,5 @@
 #include <opencv2/highgui/highgui.hpp>
 
 QVector<QVector<QString>> freader();
-QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion );
+std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion );
 QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portion );

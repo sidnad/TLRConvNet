@@ -30,7 +30,6 @@ QVector<QVector<QString>> freader(){
 
     QVector<QVector<QString>> data = QVector< QVector<QString> >();
 
-    std::cout << "----------------------" << std::endl;
     for(int i = 0; i < filesList1.length(); i++){
         QString fn1 = filesList1.at(i);
         QString fn2 = filesList2.at(i);
@@ -40,7 +39,6 @@ QVector<QVector<QString>> freader(){
         //std::cout << fl1.at(i).toStdString() << std::endl;
     }
 
-    std::cout << "----------------------" << std::endl;
     for(int i = 0; i < filesList3.length(); i++){
         QString fn3 = filesList3.at(i);
         QString fn4 = filesList4.at(i);
@@ -60,8 +58,8 @@ QVector<QVector<QString>> freader(){
 }
 
 
-QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
-    QVector<cv::Mat> rgbdList = QVector<cv::Mat>();
+std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
+    std::vector<cv::Mat> rgbdList;
     cv::Mat img, depth;
     cv::Mat rgbd;
     std::vector<cv::Mat> splitBGR, splitDepth;
@@ -78,35 +76,36 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
 
     QVector<QString> fp_rgb, fp_depth;
     for (int i = 0; i < positive4train; i++){
+        splitBGR.clear();
+        splitDepth.clear();
+        cv::Mat rgbd;
+        //std::cout << data.at(0).at(i).toStdString() << std::endl;
         img = cv::imread(data.at(0).at(i).toStdString());
         depth = cv::imread(data.at(1).at(i).toStdString());
-        cv::convertScaleAbs(depth,depth,1,0);
+        depth.convertTo(depth, CV_8UC1);
         cv::split(img, splitBGR);
         cv::split(depth, splitDepth);
         splitBGR.push_back(splitDepth[0]);
         cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
+/*
+        cv::namedWindow("PuRSE");
+        cv::imshow("PuRSE", img);
+        cv::waitKey(100);*/
     }
     for (int i = 0; i < negative4train; i++){
+        splitBGR.clear();
+        splitDepth.clear();
+        cv::Mat rgbd;
+        //std::cout << data.at(2).at(i).toStdString() << std::endl;
         img = cv::imread(data.at(2).at(i).toStdString());
         depth = cv::imread(data.at(3).at(i).toStdString());
-        cv::convertScaleAbs(depth,depth,1,0);
+        depth.convertTo(depth, CV_8UC1);
         cv::split(img, splitBGR);
         cv::split(depth, splitDepth);
         splitBGR.push_back(splitDepth[0]);
         cv::merge(splitBGR, rgbd);
         rgbdList.push_back(rgbd);
-    }
-
-    depth = cv::imread(data.at(3).at(25).toStdString());
-    cv::namedWindow("PuRSE");
-    //cv::convertScaleAbs(depth,depth,1,0);
-    cv::imshow("PuRSE", depth);
-    cv::waitKey(300);
-    for(int u = 0; u < depth.rows; u++){
-        for(int v = 0; v < depth.cols; v++){
-            std::cout << "----------------------value: " << depth.at<int>(u,v) << std::endl;
-        }
     }
 
     return rgbdList;

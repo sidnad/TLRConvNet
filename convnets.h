@@ -12,6 +12,7 @@
 #include <opencv/cv.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <QTime>
 
 std::vector<cv::Mat> convGenerator(int size, int number, int epoch);
 cv::Mat zeropadding(cv::Mat rgbd, int padding);
