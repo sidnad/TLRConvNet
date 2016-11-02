@@ -204,3 +204,23 @@ cv::Mat reshape(QVector<cv::Mat> res){
     }
     return output;
 }
+
+
+//Back propagation
+cv:Mat error(cv::Mat output,cv:Mat expected){
+	cv::Mat error;
+	for(int i=0;i<output.length();i++){
+		error.at(i)=expected.at(i)-output.at(i);
+	}
+	return error;
+}
+
+
+int learningrate;
+cv::Mat adjust(cv::Mat error,cv::Mat fullyconnected){
+	cv::Mat newWeight;
+	for(int i=0;i<fullyconnected.length();i++){
+		newWeight.at(i)=fullyconnected.at(i)-learningrate*error.at(i);
+	}
+	return newWeight;
+}
