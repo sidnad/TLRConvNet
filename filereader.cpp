@@ -3,9 +3,9 @@
 QVector<QVector<QString>> freader(){
 
     QString imgPath_positive = "../TLRConvNet/cropped_data/reshape_positive_rgb/";
-    QString depthPath_positive = "../TLRConvNet/cropped_data/reshape_positive_depth/";
+    QString depthPath_positive = "../TLRConvNet/cropped_data/reshape_positive_depth256/";
     QString imgPath_negative = "../TLRConvNet/cropped_data/reshape_negative_rgb/";
-    QString depthPath_negative = "../TLRConvNet/cropped_data/reshape_negative_depth/";
+    QString depthPath_negative = "../TLRConvNet/cropped_data/reshape_negative_depth256/";
 
     QDir imgPosDir(imgPath_positive);
     QDir depthPosDir(depthPath_positive);
@@ -30,6 +30,7 @@ QVector<QVector<QString>> freader(){
 
     QVector<QVector<QString>> data = QVector< QVector<QString> >();
 
+    std::cout << "----------------------" << std::endl;
     for(int i = 0; i < filesList1.length(); i++){
         QString fn1 = filesList1.at(i);
         QString fn2 = filesList2.at(i);
@@ -38,6 +39,8 @@ QVector<QVector<QString>> freader(){
 
         //std::cout << fl1.at(i).toStdString() << std::endl;
     }
+
+    std::cout << "----------------------" << std::endl;
     for(int i = 0; i < filesList3.length(); i++){
         QString fn3 = filesList3.at(i);
         QString fn4 = filesList4.at(i);
@@ -96,14 +99,12 @@ QVector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_
     }
 
     depth = cv::imread(data.at(3).at(25).toStdString());
-    cv::Mat depth8;
     cv::namedWindow("PuRSE");
     //cv::convertScaleAbs(depth,depth,1,0);
     cv::imshow("PuRSE", depth);
     cv::waitKey(300);
     for(int u = 0; u < depth.rows; u++){
         for(int v = 0; v < depth.cols; v++){
-            //depth8.at<int>(u,v) = depth.at<CV_16U>(u,v)/256;
             std::cout << "----------------------value: " << depth.at<int>(u,v) << std::endl;
         }
     }

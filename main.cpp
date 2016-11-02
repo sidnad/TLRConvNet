@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QVector<QVector<QString>> data = freader();
-
     QVector<cv::Mat> rgbdList = farranger_rgbd(data, 0.07); // former 7% for training.
     QVector<int> rgbd_gt = farranger_gt(data, 0.07);//ground truth, 1 for TL, 0 for other.
 
