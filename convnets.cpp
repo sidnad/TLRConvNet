@@ -205,3 +205,50 @@ cv::Mat reshape(QVector<cv::Mat> res){
     return output;
 }
 
+std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth){
+    std::vector<std::vector<double>> probabilityMat;
+    std::vector<double> vector;
+    qsrand(1); //choose seed
+    int length = groundTruth.size();
+    for(int i = 0; i < length; i++){
+        vector.push_back((double)qrand()/RAND_MAX);
+    }
+    probabilityMat.push_back(vector);
+    vector.clear();
+    for(int i = 0; i < length; i++){
+        vector.push_back((double)qrand()/RAND_MAX);
+    }
+    probabilityMat.push_back(vector);
+    return probabilityMat;
+}
+
+std::vector<int> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat){
+    std::vector<int> likelihoodList;
+    double positiveVal, negativeVal;
+    for(int j = 0; j < res3.rows; j++){
+        positiveVal = 0;
+        negativeVal = 0;
+        for(int i = 0; i < probabilityMat.at(0).size(); i++){
+            positiveVal += (double) probabilityMat.at(0).at(i) * res3.at<double>(j, i);
+            negativeVal += (double) probabilityMat.at(1).at(i) * res3.at<double>(j, i);
+            //std::cout << "res3.at<int>(j, i): " << res3.at<double>(j, i) << std::endl;
+            //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
+        }
+        std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
+        likelihoodList.push_back((positiveVal > negativeVal)? 1 : 0);
+    }
+    return likelihoodList;
+}
+
+double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList){
+    std::vector<double> correctPercentageList;
+
+    int correctCount = 0;
+    for(int i = 0; i < groundTruth.size(); i++){
+        if(groundTruth.at(i) == likelihoodList.at(i)){
+            correctCount++;
+        }
+    }
+    double correctPercentage = (double) correctCount / groundTruth.size();
+    return correctPercentage;
+}

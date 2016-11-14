@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QVector<QVector<QString>> data = freader();
     std::vector<cv::Mat> rgbdList = farranger_rgbd(data, 0.07); // former 7% for training.
+    std::vector<int> groundTruth = groundTruthVector(data, 0.07);
+    std::vector<std::vector<double>> probabilityMat = probMatInit(groundTruth);
     QVector<int> rgbd_gt = farranger_gt(data, 0.07);//ground truth, 1 for TL, 0 for other.
 
     std::vector<cv::Mat> conv1 = convGenerator(7, 8, 1); // 7x7, 8 filters. The inside QVector is RGBD 4 layer, second QVector is # of filters.
@@ -28,6 +30,7 @@ int main(int argc, char *argv[])
         res1 = convolution(rgbd, conv1, 8, 1);
         //RELU LAYER
         res1 = relu(res1, 1);
+        showImage(res1, "");
         //POOLING
         res1 = pooling(res1, 4, 1);
         std::cout << "iteration: " << i << "  -------------epoch 2-------------" << std::endl;
@@ -43,11 +46,11 @@ int main(int argc, char *argv[])
         //POOLING
         res2 = pooling(res2, 4, 2);
 
-        showImage(res2, "../TLRConvNet/images_pooling2/");
+        //showImage(res2, "../TLRConvNet/images_pooling2/");
 
         res2list.push_back(res2);
     }
-    std::cout << "---reshape---" << std::endl;
+
     //RESHAPE
     cv::Mat res3;
     res3 = reshape(res2list); //522 * (6*6*16) = 150*576
@@ -65,13 +68,21 @@ int main(int argc, char *argv[])
                 //std::cout << val2 << std::endl;
         }
     }
-    std::cout << "---reshape2---" << std::endl;
+
     //cv::Mat testMat = cv::Mat( outputfinal ).reshape( 0, 256 );
     //testMat.convertTo( testMat, CV_8UC1 );
 
     cv::namedWindow("PuRSE");
     cv::imshow("PuRSE", outputfinal);
     cv::waitKey(10);
+
+    //CALCULATION
+    std::vector<int> likelihoodList = calculation(res3, probabilityMat);
+    for(int i = 0; i< likelihoodList.size(); i++)
+        std::cout << likelihoodList.at(i) << std::endl;
+    double correctPercentage = correctPercentageCalculation(groundTruth, likelihoodList);
+    std::cout << "Correct Precentage: " << correctPercentage << std::endl;
+
 
     /*
     //CLASSIFICATION

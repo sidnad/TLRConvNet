@@ -20,3 +20,6 @@ cv::Mat relu(cv::Mat res, int epoch);
 cv::Mat convolution(cv::Mat rgbd, std::vector<cv::Mat> kernel, int filterCount, int epoch);
 cv::Mat pooling(cv::Mat res, int size, int epoch);
 cv::Mat reshape(QVector<cv::Mat> res);
+std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth);
+std::vector<int> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat);
+double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList);

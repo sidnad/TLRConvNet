@@ -72,7 +72,7 @@ std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double train
     negative4train = floor(training_portion * negativeCount);
 
     std::cout << "Total data amount: " << positiveCount + negativeCount << ". Positive count: " << positiveCount << ". Negative count: " << negativeCount << std::endl;
-    std::cout << "Total training data (70%) amount: " << positive4train + negative4train << std::endl;
+    std::cout << "Total training data (7%) amount: " << positive4train + negative4train << std::endl;
 
     QVector<QString> fp_rgb, fp_depth;
     for (int i = 0; i < positive4train; i++){
@@ -112,6 +112,25 @@ std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double train
 }
 
 
+std::vector<int> groundTruthVector(QVector<QVector<QString>> data, double training_portion ){
+    int positiveCount, negativeCount, positive4train, negative4train;
+    std::vector<int> groundTruth;
+    positiveCount = data.at(0).length();
+    negativeCount = data.at(2).length();
+
+    positive4train = floor(training_portion * positiveCount);
+    negative4train = floor(training_portion * negativeCount);
+    std::cout << "Positive training data (7%) amount: " << positive4train << " Negative training data (7%) amount: " << negative4train << std::endl;
+    for (int i = 0; i < positive4train; i++){
+        groundTruth.push_back(1);
+    }
+    for (int i = 0; i < negative4train; i++){
+        groundTruth.push_back(0);
+    }
+    return groundTruth;
+}
+
+
 QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portion){
     QVector<int> rgbd_gt = QVector<int>();
     int positiveCount, negativeCount, positive4train, negative4train;
@@ -143,7 +162,7 @@ void showImage(cv::Mat image, std::string saveDir){
     cv::merge(rgblayer, rgb);
     cv::convertScaleAbs(rgb,rgb,1,0);
     cv::imshow("image", rgb);
-    cv::waitKey(300);
+    cv::waitKey(10);
     //std::string name = saveDir + std::to_string(i) + ".png";
     //cv::imwrite(name, rgb);
 }

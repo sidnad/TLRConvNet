@@ -16,5 +16,6 @@
 
 QVector<QVector<QString>> freader();
 std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion );
+std::vector<int> groundTruthVector(QVector<QVector<QString>> data, double training_portion );
 QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portion );
 void showImage(cv::Mat image, std::string saveDir);
