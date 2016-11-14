@@ -222,9 +222,10 @@ std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth){
     return probabilityMat;
 }
 
-std::vector<int> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat){
-    std::vector<int> likelihoodList;
-    double positiveVal, negativeVal;
+std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat, std::vector<int> groundTruth){
+    std::vector<std::vector<double>> errorList;
+    std::vector<double> positiveErrorList, negativeErrorList;
+    double positiveVal, negativeVal, positiveError, negativeError;
     for(int j = 0; j < res3.rows; j++){
         positiveVal = 0;
         negativeVal = 0;
@@ -235,11 +236,23 @@ std::vector<int> calculation(cv::Mat res3, std::vector<std::vector<double>> prob
             //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
         }
         std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
-        likelihoodList.push_back((positiveVal > negativeVal)? 1 : 0);
+        //NORMALIZE
+        if (groundTruth.at(j) == 1){
+            positiveError = 1 - positiveVal / (positiveVal+negativeVal);
+            negativeError = negativeVal / (positiveVal+negativeVal);
+        }
+        else{
+            positiveError = positiveVal / (positiveVal+negativeVal);
+            negativeError = 1 - negativeVal / (positiveVal+negativeVal);
+        }
+        positiveErrorList.push_back(positiveError);
+        negativeErrorList.push_back(negativeError);
+        errorList.push_back(positiveErrorList);
+        errorList.push_back(negativeErrorList);
     }
-    return likelihoodList;
+    return errorList;
 }
-
+/*
 double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList){
     std::vector<double> correctPercentageList;
 
@@ -252,3 +265,4 @@ double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<in
     double correctPercentage = (double) correctCount / groundTruth.size();
     return correctPercentage;
 }
+*/

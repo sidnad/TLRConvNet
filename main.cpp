@@ -77,11 +77,9 @@ int main(int argc, char *argv[])
     cv::waitKey(10);
 
     //CALCULATION
-    std::vector<int> likelihoodList = calculation(res3, probabilityMat);
-    for(int i = 0; i< likelihoodList.size(); i++)
-        std::cout << likelihoodList.at(i) << std::endl;
-    double correctPercentage = correctPercentageCalculation(groundTruth, likelihoodList);
-    std::cout << "Correct Precentage: " << correctPercentage << std::endl;
+    std::vector<std::vector<double>> errorList = calculation(res3, probabilityMat, groundTruth);
+    //double correctPercentage = correctPercentageCalculation(groundTruth, errorList);
+    //std::cout << "Correct Precentage: " << correctPercentage << std::endl;
 
 
     /*

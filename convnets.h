@@ -21,5 +21,5 @@ cv::Mat convolution(cv::Mat rgbd, std::vector<cv::Mat> kernel, int filterCount, 
 cv::Mat pooling(cv::Mat res, int size, int epoch);
 cv::Mat reshape(QVector<cv::Mat> res);
 std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth);
-std::vector<int> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat);
-double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList);
+std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat, std::vector<int> groundTruth);
+//double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList);
