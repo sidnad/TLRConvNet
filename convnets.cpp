@@ -205,11 +205,31 @@ cv::Mat reshape(QVector<cv::Mat> res){
     return output;
 }
 
+cv::Mat reshape_testing(QVector<cv::Mat> res){
+    cv::Mat output(21, 576, CV_64F, cv::Scalar(0));
+    cv::Mat currRes;
+    std::vector<cv::Mat> splitLayer;
+    for(int i = 0; i < res.length(); i++){
+        currRes = res.at(i);
+
+
+        cv::split(currRes, splitLayer);
+        for(int j = 0; j < splitLayer.size(); j++){
+            for(int x = 0; x < 6; x++){
+                for(int y = 0; y < 6; y++){
+                    output.at<double>(i, j*36 + x*5 + y) = currRes.at<double>(x,y);
+                }
+            }
+        }
+    }
+    return output;
+}
+
 std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth){
     std::vector<std::vector<double>> probabilityMat;
     std::vector<double> vector;
     qsrand(1); //choose seed
-    int length = groundTruth.size();
+    int length = 576;//groundTruth.size();
     for(int i = 0; i < length; i++){
         vector.push_back((double)qrand()/RAND_MAX);
     }
@@ -260,4 +280,54 @@ double correctPercentageCalculation(std::vector<std::vector<double>> errorList, 
     }
     double correctPercentage = (double) correctCount / errorList.at(0).size();
     return correctPercentage;
+}
+
+std::vector<std::vector<double>> calculateDelta(cv::Mat res3, std::vector<std::vector<double>> errorlist,int learningrate){
+    cv::Mat res3transpose(576, 51, CV_64F, cv::Scalar(0));                          //Calculate transpose
+    for(int i=0;i<res3.rows;i++){
+        for(int j=0;j<res3.cols;j++){
+            res3transpose.at<double>(j,i)=res3.at<double>(i,j);
+        }
+    }
+
+    cv::Mat errormat(51, 2, CV_64F, cv::Scalar(0));                      //Get matrix from error list
+    for(int i=0;i<51;i++){
+        errormat.at<double>(i,0)=errorlist.at(0).at(i);
+        errormat.at<double>(i,1)=errorlist.at(1).at(i);
+    }
+
+    cv::Mat deltamat(576, 2, CV_64F, cv::Scalar(0));
+    for(int i=0;i<res3transpose.rows;i++){            //Multiply error and transpose
+        for(int j=0;j<errormat.cols;j++){
+            for(int k=0;k<res3transpose.cols;k++){
+                deltamat.at<double>(i,j)+=res3transpose.at<double>(i,k)*errormat.at<double>(k,j);
+            }
+        }
+    }
+
+    std::vector<std::vector<double>> delta; //576*2
+    std::vector<double> col;
+    for (int i = 0; i < deltamat.rows; i++){
+        col.push_back(deltamat.at<double>(i,0));
+    }
+    delta.push_back(col);
+    col.clear();
+    for (int i = 0; i < deltamat.rows; i++){
+        col.push_back(deltamat.at<double>(i,1));
+    }
+    delta.push_back(col);
+
+    for (int i = 0; i < delta.at(0).size(); i++){
+        delta.at(0).at(i)=delta.at(0).at(i)*learningrate;
+        delta.at(1).at(i)=delta.at(1).at(i)*learningrate;
+    }
+    return delta;
+}
+
+std::vector<std::vector<double>> trainFCL(std::vector<std::vector<double>> probabilityMat,std::vector<std::vector<double>> delta){
+    for (int i = 0; i < delta.at(0).size(); i++){
+        probabilityMat.at(0).at(i) += delta.at(0).at(i);//+probabilityMat.at(0).at(i);
+        probabilityMat.at(1).at(i) += delta.at(1).at(i);//+probabilityMat.at(1).at(i);
+    }
+    return probabilityMat;
 }

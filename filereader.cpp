@@ -58,7 +58,7 @@ QVector<QVector<QString>> freader(){
 }
 
 
-std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion){
+std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double training_portion, int offset){
     std::vector<cv::Mat> rgbdList;
     cv::Mat img, depth;
     cv::Mat rgbd;
@@ -75,7 +75,7 @@ std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double train
     std::cout << "Total training data (7%) amount: " << positive4train + negative4train << std::endl;
 
     QVector<QString> fp_rgb, fp_depth;
-    for (int i = 0; i < positive4train; i++){
+    for (int i = offset; i < positive4train + offset; i++){
         splitBGR.clear();
         splitDepth.clear();
         cv::Mat rgbd;
@@ -93,7 +93,7 @@ std::vector<cv::Mat> farranger_rgbd(QVector<QVector<QString>> data, double train
         cv::imshow("PuRSE", img);
         cv::waitKey(100);*/
     }
-    for (int i = 0; i < negative4train; i++){
+    for (int i = offset; i < negative4train + offset; i++){
         splitBGR.clear();
         splitDepth.clear();
         cv::Mat rgbd;
