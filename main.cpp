@@ -36,29 +36,18 @@ int main(int argc, char *argv[])
         //CONV2
         res2 = convolution(res1, conv2, 16, 2);
 
-
-        cv::namedWindow("PuRSE");
-        std::vector<cv::Mat> rgbdlayer,rgblayer;
-        cv::Mat rgb;
-        cv::split(res2, rgbdlayer);
-        rgblayer.push_back(rgbdlayer[0]);
-        rgblayer.push_back(rgbdlayer[1]);
-        rgblayer.push_back(rgbdlayer[2]);
-        cv::merge(rgblayer, rgb);
-        cv::convertScaleAbs(rgb,rgb,1,0);
-        cv::imshow("PuRSE", rgb);
-        cv::waitKey(300);
-        std::string name = "../TLRConvNet/images/" +std::to_string(i)+ ".png";
-        cv::imwrite(name, rgb);
-
+        showImage(res2, "../TLRConvNet/images/");
 
         //RELU LAYER
         res2 = relu(res2, 2);
         //POOLING
         res2 = pooling(res2, 4, 2);
 
+        showImage(res2, "../TLRConvNet/images_pooling2/");
+
         res2list.push_back(res2);
     }
+    std::cout << "---reshape---" << std::endl;
     //RESHAPE
     cv::Mat res3;
     res3 = reshape(res2list); //522 * (6*6*16) = 150*576
@@ -76,6 +65,7 @@ int main(int argc, char *argv[])
                 //std::cout << val2 << std::endl;
         }
     }
+    std::cout << "---reshape2---" << std::endl;
     //cv::Mat testMat = cv::Mat( outputfinal ).reshape( 0, 256 );
     //testMat.convertTo( testMat, CV_8UC1 );
 
@@ -83,7 +73,7 @@ int main(int argc, char *argv[])
     cv::imshow("PuRSE", outputfinal);
     cv::waitKey(10);
 
-    
+    /*
     //CLASSIFICATION
     QVector<QVector<double>> res4; // [0.89 0.54], ...
     cv::Mat fullyConnLayerWeight = (784, 2, CV_8UC1, cv::Scalar(0));
@@ -102,7 +92,9 @@ int main(int argc, char *argv[])
     cv::Mat expected, fullyconnected;
     cv::Mat errorMat = error(outputfinal, expected);
     
-    cv::Mat adjust(errorMat, fullyConnLayerWeight);
+    cv::Mat adjust(errorMat, fullyConnLayerWeight);*/
 
     return a.exec();
 }
+
+

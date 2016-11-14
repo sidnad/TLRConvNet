@@ -131,3 +131,19 @@ QVector<int> farranger_gt(QVector<QVector<QString>> data, double training_portio
 
     return rgbd_gt;
 }
+
+void showImage(cv::Mat image, std::string saveDir){
+    cv::namedWindow("image");
+    std::vector<cv::Mat> rgbdlayer,rgblayer;
+    cv::Mat rgb;
+    cv::split(image, rgbdlayer);
+    rgblayer.push_back(rgbdlayer[0]);
+    rgblayer.push_back(rgbdlayer[1]);
+    rgblayer.push_back(rgbdlayer[2]);
+    cv::merge(rgblayer, rgb);
+    cv::convertScaleAbs(rgb,rgb,1,0);
+    cv::imshow("image", rgb);
+    cv::waitKey(300);
+    //std::string name = saveDir + std::to_string(i) + ".png";
+    //cv::imwrite(name, rgb);
+}
