@@ -225,6 +225,7 @@ std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth){
 std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat, std::vector<int> groundTruth){
     std::vector<std::vector<double>> errorList;
     std::vector<double> positiveErrorList, negativeErrorList;
+    std::vector<double> guessList;
     double positiveVal, negativeVal, positiveError, negativeError;
     for(int j = 0; j < res3.rows; j++){
         positiveVal = 0;
@@ -235,34 +236,28 @@ std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vect
             //std::cout << "res3.at<int>(j, i): " << res3.at<double>(j, i) << std::endl;
             //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
         }
-        std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
+        //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
         //NORMALIZE
-        if (groundTruth.at(j) == 1){
-            positiveError = 1 - positiveVal / (positiveVal+negativeVal);
-            negativeError = negativeVal / (positiveVal+negativeVal);
-        }
-        else{
-            positiveError = positiveVal / (positiveVal+negativeVal);
-            negativeError = 1 - negativeVal / (positiveVal+negativeVal);
-        }
+        positiveError = groundTruth.at(j) - positiveVal / (positiveVal+negativeVal);
+        negativeError = groundTruth.at(j) - negativeVal / (positiveVal+negativeVal);
+
         positiveErrorList.push_back(positiveError);
         negativeErrorList.push_back(negativeError);
-        errorList.push_back(positiveErrorList);
-        errorList.push_back(negativeErrorList);
+        guessList.push_back((positiveVal > negativeVal)? 1:0);
     }
+    errorList.push_back(positiveErrorList);
+    errorList.push_back(negativeErrorList);
+    errorList.push_back(guessList);
     return errorList;
 }
-/*
-double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList){
-    std::vector<double> correctPercentageList;
 
+double correctPercentageCalculation(std::vector<std::vector<double>> errorList, std::vector<int> groundTruth){
     int correctCount = 0;
-    for(int i = 0; i < groundTruth.size(); i++){
-        if(groundTruth.at(i) == likelihoodList.at(i)){
+    for(int i = 0; i < errorList.at(2).size(); i++){
+        if((int)errorList.at(2).at(i) == groundTruth.at(i)){
             correctCount++;
         }
     }
-    double correctPercentage = (double) correctCount / groundTruth.size();
+    double correctPercentage = (double) correctCount / errorList.at(0).size();
     return correctPercentage;
 }
-*/

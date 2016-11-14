@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 
     //CALCULATION
     std::vector<std::vector<double>> errorList = calculation(res3, probabilityMat, groundTruth);
-    //double correctPercentage = correctPercentageCalculation(groundTruth, errorList);
-    //std::cout << "Correct Precentage: " << correctPercentage << std::endl;
+    double correctPercentage = correctPercentageCalculation(errorList, groundTruth);
+    std::cout << "Correct Precentage: " << correctPercentage << std::endl;
 
 
     /*

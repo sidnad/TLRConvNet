@@ -22,4 +22,4 @@ cv::Mat pooling(cv::Mat res, int size, int epoch);
 cv::Mat reshape(QVector<cv::Mat> res);
 std::vector<std::vector<double>> probMatInit(std::vector<int> groundTruth);
 std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vector<double>> probabilityMat, std::vector<int> groundTruth);
-//double correctPercentageCalculation(std::vector<int> groundTruth, std::vector<int> likelihoodList);
+double correctPercentageCalculation(std::vector<std::vector<double>> errorList, std::vector<int> groundTruth);
