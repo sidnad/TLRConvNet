@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "filereader.h"
 #include "convnets.h"
+#include "writefile.h"
 #include <QApplication>
 #include <opencv/cv.h>
 #include <opencv2/core/core.hpp>
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
         res1 = convolution(rgbd, conv1, 8, 1);
         //RELU LAYER
         res1 = relu(res1, 1);
-        showImage(res1, "");
+        //showImage(res1, "");
         //POOLING
         res1 = pooling(res1, 4, 1);
         std::cout << "iteration: " << i << "  -------------epoch 2-------------" << std::endl;
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
         //CONV2
         res2 = convolution(res1, conv2, 16, 2);
 
-        showImage(res2, "../TLRConvNet/images/");
+        //showImage(res2, "../TLRConvNet/images/");
 
         //RELU LAYER
         res2 = relu(res2, 2);
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
         res1 = convolution(rgbd, conv1, 8, 1);
         //RELU LAYER
         res1 = relu(res1, 1);
-        showImage(res1, "");
+        //showImage(res1, "");
         //POOLING
         res1 = pooling(res1, 4, 1);
         std::cout << "iteration: " << i << "  -------------epoch 2-------------" << std::endl;
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
         //CONV2
         res2 = convolution(res1, conv2, 16, 2);
 
-        showImage(res2, "../TLRConvNet/images/");
+        //showImage(res2, "../TLRConvNet/images/");
 
         //RELU LAYER
         res2 = relu(res2, 2);
@@ -139,6 +140,12 @@ int main(int argc, char *argv[])
     correctPercentage = correctPercentageCalculation(errorList2, groundTruth2);
     std::cout << "Final Estimate Precentage: " << correctPercentage << std::endl;
 
+    //Save conv1, conv2, probabilityMat
+
+    //writeConv1(conv1);
+    //writeConv2(conv2);
+    writeProbMat(probabilityMat);
+    std::cout << "All done." << std::endl;
 
     return a.exec();
 }

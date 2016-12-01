@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     filereader.cpp \
-    convnets.cpp
+    convnets.cpp \
+    writefile.cpp
 
 HEADERS  += mainwindow.h \
     filereader.h \
-    convnets.h
+    convnets.h \
+    writefile.h
 
 FORMS    += mainwindow.ui
 INCLUDEPATH += /usr/local/include/opencv
