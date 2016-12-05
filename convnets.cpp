@@ -7,6 +7,7 @@ std::vector<cv::Mat> convGenerator(int size, int number, int epoch){
     //qsrand(QTime::currentTime().msec());
     qsrand(1); //choose seed
     for (int i = 0; i < number; i++){
+        qsrand(number);
         if (epoch == 1){
             convnet = cv::Mat(size, size, CV_64FC(4), cv::Scalar(0, 0, 0, 0));
         }
@@ -118,8 +119,9 @@ cv::Mat convolution(cv::Mat rgbd, std::vector<cv::Mat> kernel, int filterCount, 
                                 double kernelVal = singleKernelList.at(l).at<double>(u,v);
                                 //rgbdVal = rgbdlist.at(l).at<int>(x+u, y+v);
                                 if(epoch==1) rgbdVal = rgbd.at<cv::Vec4b>(x+u, y+v)[l];
-                                if(epoch==2) rgbdVal = rgbdlist[l].at<cv::Vec4b>(x+u, y+v)[0];
-                                //std::cout << kernelVal << " " << rgbdVal << std::endl;
+                                if(epoch==2) rgbdVal = rgbdlist[l].at<double>(x+u, y+v);
+                                //if(epoch==2) rgbdVal = rgbdlist[l].at<cv::Vec4b>(x+u, y+v)[0];
+                                //if(epoch==2) std::cout << kernelVal << " " << rgbdVal << std::endl;
                                 tempval = tempval + kernelVal * rgbdVal;
                             }
                     }
@@ -190,15 +192,20 @@ cv::Mat reshape(QVector<cv::Mat> res){
     cv::Mat output(51, 576, CV_64F, cv::Scalar(0));
     cv::Mat currRes;
     std::vector<cv::Mat> splitLayer;
+    std::cout << "*****************  Starting Reshape  *****************" << std::endl;
+    std::cout << "size of the result list: " << res.length() << std::endl;
+
     for(int i = 0; i < res.length(); i++){
         currRes = res.at(i);
 
+
+        //std::cout << "current result mat layer: " << currRes.channels() << std::endl;
 
         cv::split(currRes, splitLayer);
         for(int j = 0; j < splitLayer.size(); j++){ // 16 layers
             for(int x = 0; x < 6; x++){
                 for(int y = 0; y < 6; y++){
-                    output.at<double>(i, j*36 + x*5 + y) = splitLayer.at(j).at<double>(x,y);
+                    output.at<double>(i, j*36 + x*6 + y) = splitLayer.at(j).at<double>(x,y);
                 }
             }
         }
@@ -255,7 +262,7 @@ std::vector<std::vector<double>> calculation(cv::Mat res3, std::vector<std::vect
             positiveVal += (double) probabilityMat.at(0).at(i) * res3.at<double>(j, i);
             negativeVal += (double) probabilityMat.at(1).at(i) * res3.at<double>(j, i);
             //std::cout << "res3.at<int>(j, i): " << res3.at<double>(j, i) << std::endl;
-            //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
+            //std::cout << "iteration: " << i << " positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
         }
         //std::cout << "positive val: " << positiveVal << "  Negative val: " << negativeVal << std::endl;
         //NORMALIZE

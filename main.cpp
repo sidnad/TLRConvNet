@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
     cv::namedWindow("PuRSE");
     cv::imshow("PuRSE", outputfinal);
-    cv::waitKey(10);
+    cv::waitKey(100);
 
     int iteration = 0;
     while(iteration < 50){
